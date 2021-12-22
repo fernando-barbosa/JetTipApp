@@ -1,6 +1,7 @@
 package br.com.fernandobarbosa.jettipapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -84,6 +85,17 @@ fun TopHeader(totalPerPerson: Double = 134.0) {
 @Preview
 @Composable
 fun MainContent() {
+    BillForm() {
+        billAmount -> Log.d("Amount", "MainContent: $billAmount")
+    }
+}
+
+@ExperimentalComposeUiApi
+@Composable
+fun BillForm(
+    modifier: Modifier = Modifier,
+    onValChange: (String) -> Unit = {}
+) {
     val totalBillState = remember {
         mutableStateOf("")
     }
@@ -108,7 +120,7 @@ fun MainContent() {
                 isSingleLine = true,
                 onAction = KeyboardActions {
                     if (!validState) return@KeyboardActions
-                    //TODO - quando o valor alterar
+                    onValChange(totalBillState.value.trim())
                     keyboardController?.hide()
                 }
             )
