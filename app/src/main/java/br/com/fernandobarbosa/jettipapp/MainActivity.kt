@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Slider
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -103,11 +104,18 @@ fun BillForm(
     val totalBillState = remember {
         mutableStateOf("")
     }
+
     val validState = remember(totalBillState.value) {
         totalBillState.value.trim().isNotEmpty()
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    val sliderPositionState = remember {
+        mutableStateOf(0f)
+    }
+
+    TopHeader()
 
     Surface(
         modifier = Modifier
@@ -132,9 +140,11 @@ fun BillForm(
                     keyboardController?.hide()
                 }
             )
-            if (validState) {
+            if (!validState) {
                 Row(
-                    modifier = Modifier.padding(3.dp),
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Text(
@@ -143,7 +153,9 @@ fun BillForm(
                             alignment = Alignment.CenterVertically
                         )
                     )
-                    Spacer(modifier = Modifier.width(120.dp))
+                    Spacer(modifier = Modifier.width(200.dp))
+
+                    //Split Row
                     Row(
                         modifier = Modifier.padding(horizontal = 3.dp),
                         horizontalArrangement = Arrangement.End
@@ -153,7 +165,12 @@ fun BillForm(
                             onClick = { /*TODO*/ }
                         )
 
-
+                        Text(
+                            text = "2",
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 10.dp, end = 10.dp)
+                        )
 
                         RoundIconButton(
                             imageVector = Icons.Default.Add,
@@ -161,6 +178,46 @@ fun BillForm(
                         )
                     }
                 }
+
+                //Tip Row
+                Row(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Tip",
+                        modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                    )
+                    Spacer(modifier = Modifier.width(212.dp))
+                    Text(
+                        text = "R$ 33,00",
+                        modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                    )
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "33%")
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    Slider(
+                        value = sliderPositionState.value,
+                        onValueChange = { newVal ->
+                            sliderPositionState.value = newVal
+                            Log.d("Slider", "BillForm: $newVal")
+                        },
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                        steps = 5,
+                        onValueChangeFinished = {
+                            /*TODO*/
+                        }
+                    )
+                }
+
             } else {
                 Box() {}
             }
