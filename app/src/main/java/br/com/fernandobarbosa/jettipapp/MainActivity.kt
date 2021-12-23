@@ -10,10 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Slider
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
@@ -35,11 +32,11 @@ import br.com.fernandobarbosa.jettipapp.widgets.RoundIconButton
 
 @ExperimentalComposeUiApi
 class MainActivity : ComponentActivity() {
+    @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyApp {
-                //TopHeader()
                 MainContent()
             }
         }
@@ -61,6 +58,7 @@ fun TopHeader(totalPerPerson: Double = 134.0) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(16.dp)
             .height(150.dp)
             .clip(shape = RoundedCornerShape(corner = CornerSize(12.dp))),
         color = Color(0xFFE9D7F7)
@@ -86,6 +84,7 @@ fun TopHeader(totalPerPerson: Double = 134.0) {
     }
 }
 
+@ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @Preview
 @Composable
@@ -95,6 +94,7 @@ fun MainContent() {
     }
 }
 
+@ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @Composable
 fun BillForm(
@@ -114,6 +114,14 @@ fun BillForm(
     val sliderPositionState = remember {
         mutableStateOf(0f)
     }
+
+    val splitByState = remember {
+        mutableStateOf(1)
+    }
+
+    val range = IntRange(start = 1, endInclusive = 100)
+
+    val tipPercentage = (sliderPositionState.value * 100).toInt()
 
     TopHeader()
 
@@ -162,11 +170,15 @@ fun BillForm(
                     ) {
                         RoundIconButton(
                             imageVector = Icons.Default.Remove,
-                            onClick = { /*TODO*/ }
+                            onClick = {
+                                splitByState.value =
+                                    if (splitByState.value > 1) splitByState.value - 1
+                                    else 1
+                            }
                         )
 
                         Text(
-                            text = "2",
+                            text = "${splitByState.value}",
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
                                 .padding(start = 10.dp, end = 10.dp)
@@ -174,7 +186,10 @@ fun BillForm(
 
                         RoundIconButton(
                             imageVector = Icons.Default.Add,
-                            onClick = { /*TODO*/ }
+                            onClick = {
+                                if (splitByState.value < range.last)
+                                    splitByState.value = splitByState.value + 1
+                            }
                         )
                     }
                 }
@@ -201,7 +216,7 @@ fun BillForm(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "33%")
+                    Text(text = "$tipPercentage %")
                     Spacer(modifier = Modifier.height(14.dp))
 
                     Slider(
