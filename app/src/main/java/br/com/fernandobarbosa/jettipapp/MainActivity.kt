@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.com.fernandobarbosa.jettipapp.components.InputField
 import br.com.fernandobarbosa.jettipapp.ui.theme.JetTipAppTheme
+import br.com.fernandobarbosa.jettipapp.util.calculateTotalPerPerson
 import br.com.fernandobarbosa.jettipapp.util.calculateTotalTip
 import br.com.fernandobarbosa.jettipapp.widgets.RoundIconButton
 
@@ -128,31 +129,36 @@ fun BillForm(
         mutableStateOf(0.0)
     }
 
-    TopHeader()
+    val totalPerPersonState = remember {
+        mutableStateOf(0.0)
+    }
 
-    Surface(
-        modifier = Modifier
-            .padding(2.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-        border = BorderStroke(width = 1.dp, color = Color.LightGray)
-    ) {
-        Column(
-            modifier = Modifier.padding(6.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+    Column {
+        TopHeader(totalPerPerson = totalPerPersonState.value)
+
+        Surface(
+            modifier = Modifier
+                .padding(2.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+            border = BorderStroke(width = 1.dp, color = Color.LightGray)
         ) {
-            InputField(
-                valueState = totalBillState,
-                labelId = "Total da comanda",
-                enabled = true,
-                isSingleLine = true,
-                onAction = KeyboardActions {
-                    if (!validState) return@KeyboardActions
-                    onValChange(totalBillState.value.trim())
-                    keyboardController?.hide()
-                }
-            )
+            Column(
+                modifier = Modifier.padding(6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                InputField(
+                    valueState = totalBillState,
+                    labelId = "Total da comanda",
+                    enabled = true,
+                    isSingleLine = true,
+                    onAction = KeyboardActions {
+                        if (!validState) return@KeyboardActions
+                        onValChange(totalBillState.value.trim())
+                        keyboardController?.hide()
+                    }
+                )
 //            if (!validState) {
                 Row(
                     modifier = Modifier
@@ -179,6 +185,11 @@ fun BillForm(
                                 splitByState.value =
                                     if (splitByState.value > 1) splitByState.value - 1
                                     else 1
+
+                                totalPerPersonState.value =
+                                    calculateTotalPerPerson(totalBill = totalBillState.value.toDouble(),
+                                        splitBy = splitByState.value,
+                                        tipPercentage = tipPercentage)
                             }
                         )
 
@@ -194,6 +205,11 @@ fun BillForm(
                             onClick = {
                                 if (splitByState.value < range.last)
                                     splitByState.value = splitByState.value + 1
+
+                                totalPerPersonState.value =
+                                    calculateTotalPerPerson(totalBill = totalBillState.value.toDouble(),
+                                        splitBy = splitByState.value,
+                                        tipPercentage = tipPercentage)
                             }
                         )
                     }
@@ -232,6 +248,11 @@ fun BillForm(
                                 calculateTotalTip(
                                     totalBill = totalBillState.value.toDouble(),
                                     tipPercentage = tipPercentage)
+
+                            totalPerPersonState.value =
+                                calculateTotalPerPerson(totalBill = totalBillState.value.toDouble(),
+                                    splitBy = splitByState.value,
+                                    tipPercentage = tipPercentage)
                         },
                         modifier = Modifier.padding(start = 16.dp, end = 16.dp),
                         steps = 5,
@@ -244,6 +265,7 @@ fun BillForm(
 //            } else {
 //                Box() {}
 //            }
+            }
         }
     }
 }
