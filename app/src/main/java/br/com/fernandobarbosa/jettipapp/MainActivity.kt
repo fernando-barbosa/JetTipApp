@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.com.fernandobarbosa.jettipapp.components.InputField
 import br.com.fernandobarbosa.jettipapp.ui.theme.JetTipAppTheme
+import br.com.fernandobarbosa.jettipapp.util.calculateTotalTip
 import br.com.fernandobarbosa.jettipapp.widgets.RoundIconButton
 
 @ExperimentalComposeUiApi
@@ -123,6 +124,10 @@ fun BillForm(
 
     val tipPercentage = (sliderPositionState.value * 100).toInt()
 
+    val tipAmountState = remember {
+        mutableStateOf(0.0)
+    }
+
     TopHeader()
 
     Surface(
@@ -148,7 +153,7 @@ fun BillForm(
                     keyboardController?.hide()
                 }
             )
-            if (!validState) {
+//            if (!validState) {
                 Row(
                     modifier = Modifier
                         .padding(12.dp)
@@ -207,7 +212,7 @@ fun BillForm(
                     )
                     Spacer(modifier = Modifier.width(212.dp))
                     Text(
-                        text = "R$ 33,00",
+                        text = "R$ ${tipAmountState.value}",
                         modifier = Modifier.align(alignment = Alignment.CenterVertically)
                     )
                 }
@@ -223,7 +228,10 @@ fun BillForm(
                         value = sliderPositionState.value,
                         onValueChange = { newVal ->
                             sliderPositionState.value = newVal
-                            Log.d("Slider", "BillForm: $newVal")
+                            tipAmountState.value =
+                                calculateTotalTip(
+                                    totalBill = totalBillState.value.toDouble(),
+                                    tipPercentage = tipPercentage)
                         },
                         modifier = Modifier.padding(start = 16.dp, end = 16.dp),
                         steps = 5,
@@ -233,9 +241,9 @@ fun BillForm(
                     )
                 }
 
-            } else {
-                Box() {}
-            }
+//            } else {
+//                Box() {}
+//            }
         }
     }
 }
